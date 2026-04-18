@@ -4,7 +4,7 @@ A Balatro-inspired poker card game playable in any browser. No install, no serve
 
 ## How to Play
 
-1. Open `index.html` in your browser
+1. Open `index.html` in your browser  OR  You can visit [Baloney](https://baloney-by-mba.netlify.app/)
 2. Select up to **5 cards** from your hand
 3. Click **Play Hand** to score points
 4. Beat the target score before your hands run out
