@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BALONEY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0b0a10;
+  --felt:    #1a4a2c;
+  --felt2:   #163d24;
+  --surface: #13101c;
+  --border:  rgba(255,255,255,0.07);
+  --wood:    #3d2b1f;
+  --gold:    #e8b84b;
+  --gold2:   #c8981b;
+  --chip:    #4fc3f7;
+  --mult:    #ff7b72;
+  --green:   #3fb950;
+  --muted:   rgba(255,255,255,0.38);
+  --font:    'Oswald', 'Trebuchet MS', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,   rgba(255,255,255,0.012) 0,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 48px),
+    repeating-linear-gradient(90deg,  rgba(255,255,255,0.012) 0,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 48px),
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(80,30,150,0.18) 0%, transparent 60%);
+  color:#fff;
+  font-family: var(--font);
+  min-height:100vh;
+  user-select:none;
+}
+
+/* ── OUTER WRAPPER (wood frame) ── */
+.frame {
+  max-width:980px; margin:0 auto; padding:14px;
+}
+
+/* ── HEADER ── */
+.hdr {
+  display:flex; align-items:center; gap:16px;
+  background: linear-gradient(135deg,#1c1628,#13101c);
+  border:1px solid rgba(232,184,75,0.2);
+  border-radius:14px; padding:12px 18px; margin-bottom:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5),inset 0 1px 0 rgba(232,184,75,0.08);
+}
+.blind-col { flex:1; }
+.blind-name {
+  font-size:.65rem; font-weight:600; color:var(--gold); letter-spacing:3px;
+  text-transform:uppercase; margin-bottom:5px;
+}
+.prog-row { display:flex; align-items:center; gap:10px; }
+.prog-bar {
+  flex:1; max-width:200px; height:10px;
+  background:rgba(255,255,255,0.06); border-radius:5px; overflow:hidden;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.prog-fill {
+  height:100%; border-radius:5px;
+  background:linear-gradient(90deg,#c8981b,#e74c3c);
+  transition:width .7s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px rgba(232,184,75,0.4);
+}
+.score-txt {
+  font-size:1.35rem; font-weight:700; color:var(--gold);
+  text-shadow:0 0 14px rgba(232,184,75,.5); white-space:nowrap; letter-spacing:1px;
+}
+.stats { display:flex; gap:8px; }
+.pill {
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
+  border-radius:10px; padding:6px 12px; min-width:58px;
+}
+.pill-n { font-size:1.1rem; font-weight:700; line-height:1; letter-spacing:0; }
+.pill-l { font-size:.55rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-top:2px; }
+.pill.p .pill-n { color:#3fb950; }
+.pill.d .pill-n { color:#ff7b72; }
+.pill.k .pill-n { color:#8b949e; }
+
+/* ── JOKER SECTION ── */
+.joker-sec {
+  background:rgba(255,255,255,0.025);
+  border:1px solid rgba(232,184,75,0.12);
+  border-radius:14px; padding:12px 16px; margin-bottom:10px;
+}
+.sec-lbl {
+  font-size:.58rem; font-weight:600; color:rgba(232,184,75,0.55);
+  text-transform:uppercase; letter-spacing:3px; margin-bottom:10px;
+}
+.joker-row { display:flex; gap:9px; flex-wrap:wrap; }
+.jtile {
+  width:82px; border:2px solid; border-radius:10px;
+  padding:10px 7px; display:flex; flex-direction:column; align-items:center; gap:4px;
+  position:relative; overflow:hidden; cursor:default; transition:transform .2s;
+}
+.jtile:hover { transform:translateY(-5px); }
+.jtile::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 9px);
+}
+.j-icon { font-size:1.5rem; line-height:1; }
+.j-name { font-size:.58rem; font-weight:700; text-align:center; text-transform:uppercase; letter-spacing:.5px; line-height:1.2; }
+.j-eff  { font-size:.53rem; text-align:center; color:rgba(255,255,255,.5); line-height:1.3; }
+.j-lvl  { font-size:.5rem; color:rgba(255,255,255,.35); }
+.no-j   { color:rgba(255,255,255,.22); font-size:.75rem; font-style:italic; }
+
+/* ── FELT TABLE (score area + cards) ── */
+.table {
+  background: var(--felt);
+  background-image:
+    radial-gradient(ellipse at 50% 20%, rgba(50,120,70,0.4) 0%, transparent 55%),
+    repeating-linear-gradient(-45deg,transparent 0,transparent 6px,rgba(0,0,0,0.06) 6px,rgba(0,0,0,0.06) 7px);
+  border-radius:20px;
+  border:3px solid #2a6040;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.45),
+    inset 0 2px 0 rgba(255,255,255,0.05),
+    0 12px 40px rgba(0,0,0,0.7);
+  padding:18px 16px;
+  display:flex; flex-direction:column; gap:14px;
+  margin-bottom:10px;
+}
+
+/* ── SCORE / PREVIEW ── */
+.score-area {
+  min-height:80px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+}
+.htype {
+  font-size:1.6rem; font-weight:700; letter-spacing:7px;
+  text-transform:uppercase; color:#fff;
+  text-shadow:0 0 30px rgba(255,255,255,.55);
+  animation:hReveal .38s cubic-bezier(.175,.885,.32,1.275) both;
+}
+.htype.faded { opacity:.35; font-size:1.1rem; letter-spacing:4px; }
+@keyframes hReveal {
+  from { opacity:0; transform:scale(.7); letter-spacing:22px; }
+  to   { opacity:1; transform:scale(1);  letter-spacing:7px; }
+}
+.eq {
+  display:flex; align-items:center; gap:10px;
+  animation:fadeUp .3s ease .12s both;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.chip-box {
+  background:rgba(79,195,247,.13); border:2px solid var(--chip); border-radius:10px;
+  padding:6px 14px; font-weight:700; font-size:1rem; color:var(--chip);
+  display:flex; align-items:center; gap:6px; letter-spacing:.5px;
+  box-shadow:0 0 14px rgba(79,195,247,.18);
+  animation:boxPop .35s cubic-bezier(.175,.885,.32,1.275) both;
+}
+.mult-box {
+  background:rgba(255,123,114,.13); border:2px solid var(--mult); border-radius:10px;
+  padding:6px 14px; font-weight:700; font-size:1rem; color:var(--mult);
+  display:flex; align-items:center; gap:6px; letter-spacing:.5px;
+  box-shadow:0 0 14px rgba(255,123,114,.18);
+  animation:boxPop .35s cubic-bezier(.175,.885,.32,1.275) .1s both;
+}
+@keyframes boxPop {
+  from { opacity:0; transform:scale(.55); }
+  65%  { transform:scale(1.08); }
+  to   { opacity:1; transform:scale(1); }
+}
+.eq-op { font-size:1.05rem; color:rgba(255,255,255,.35); }
+.tot {
+  font-size:1.8rem; font-weight:700; color:var(--gold);
+  text-shadow:0 0 24px rgba(232,184,75,.75); letter-spacing:1px;
+  animation:totPop .42s cubic-bezier(.175,.885,.32,1.275) .28s both;
+}
+@keyframes totPop {
+  from { opacity:0; transform:scale(.35) rotate(-8deg); }
+  65%  { transform:scale(1.18) rotate(1deg); }
+  to   { opacity:1; transform:scale(1)    rotate(0); }
+}
+.preview {
+  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px; padding:10px 20px;
+  display:flex; align-items:center; gap:14px;
+  width:100%; max-width:560px;
+  animation:fadeUp .2s ease both;
+}
+.prev-hname { font-size:.9rem; font-weight:700; color:#fff; letter-spacing:2px; }
+.prev-eq    { font-size:.78rem; color:var(--muted); margin-left:auto; letter-spacing:.5px; }
+.prev-c { color:var(--chip); font-weight:700; }
+.prev-m { color:var(--mult); font-weight:700; }
+.prev-t { color:var(--gold); font-weight:700; }
+.hint   { color:rgba(255,255,255,.2); font-size:.75rem; font-style:italic; letter-spacing:1px; }
+
+/* ── HAND DIVIDER ── */
+.hand-divider {
+  border:none; border-top:1px solid rgba(255,255,255,0.06);
+  margin:0;
+}
+.hand-lbl {
+  font-size:.58rem; font-weight:600; color:rgba(255,255,255,0.3);
+  text-transform:uppercase; letter-spacing:3px; text-align:center;
+}
+
+/* ── CARDS ── */
+.hand-cards {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center; padding:4px 0;
+}
+.card {
+  width:76px; height:114px;
+  background:linear-gradient(160deg,#fdfaf4,#f5f0e8);
+  border-radius:9px; color:#1a1a2e;
+  cursor:pointer;
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:6px 6px;
+  font-weight:700;
+  border:2.5px solid rgba(0,0,0,0.1);
+  box-shadow:
+    0 6px 20px rgba(0,0,0,0.6),
+    0 2px 4px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,.9);
+  position:relative;
+  transition:transform .18s cubic-bezier(.175,.885,.32,1.275), border-color .15s, box-shadow .18s;
+  will-change:transform;
+}
+.card::before {
+  content:'';
+  position:absolute; inset:0; border-radius:7px; pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.35) 0%,transparent 45%);
+}
+.card.dealt { animation:dealIn .4s cubic-bezier(.175,.885,.32,1.275) both; }
+@keyframes dealIn {
+  from { opacity:0; transform:translateY(80px) rotate(10deg) scale(.75); }
+  to   { opacity:1; transform:translateY(0)    rotate(0)     scale(1); }
+}
+.card:hover:not(.sel):not(.go) {
+  transform:translateY(-10px);
+  box-shadow:0 18px 36px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.card.sel {
+  transform:translateY(-26px);
+  border-color:var(--gold);
+  box-shadow:0 22px 48px rgba(232,184,75,.35), 0 0 0 2px var(--gold), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.card.go { animation:launch .42s cubic-bezier(.55,.055,.675,.19) forwards; pointer-events:none; }
+@keyframes launch {
+  to { transform:translateY(-220px) scale(.6) rotate(-10deg); opacity:0; }
+}
+.card.red { color:#c0392b; }
+
+.c-corner { display:flex; flex-direction:column; align-items:flex-start; }
+.c-rank   { font-size:.92rem; font-weight:700; line-height:1; }
+.c-ss     { font-size:.68rem; line-height:1; }
+.c-mid    { font-size:1.9rem; text-align:center; line-height:1; }
+.c-face   { flex:1; display:flex; align-items:stretch; justify-content:center; overflow:hidden; margin:2px 0; border-radius:4px; }
+.c-face svg { width:100%; height:100%; display:block; }
+/* Face cards get a subtle parchment background */
+.card.face-card { background:linear-gradient(160deg,#fdf8ee,#f5edda); }
+.card.face-card.red { color:#c0392b; }
+.c-corner.bot { transform:rotate(180deg); align-items:flex-start; }
+
+/* ── CONTROLS ── */
+.controls {
+  display:flex; gap:10px; justify-content:center; align-items:center;
+  padding:4px 0 10px;
+}
+.btn {
+  padding:11px 28px; border:none; border-radius:28px;
+  font-size:.88rem; font-family:var(--font); cursor:pointer;
+  font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  transition:transform .15s, box-shadow .15s, opacity .15s;
+}
+.btn:disabled { opacity:.25; cursor:not-allowed; }
+.btn:not(:disabled):hover  { transform:translateY(-3px); }
+.btn:not(:disabled):active { transform:scale(.96); }
+.btn-play {
+  background:linear-gradient(135deg,#3fb950,#2da042);
+  color:#fff; box-shadow:0 5px 20px rgba(63,185,80,.4);
+}
+.btn-play:not(:disabled):hover { box-shadow:0 8px 28px rgba(63,185,80,.55); }
+.btn-dis {
+  background:transparent; color:#ff7b72;
+  border:2px solid rgba(255,123,114,.35);
+}
+.btn-dis:not(:disabled):hover { background:rgba(255,123,114,.1); border-color:#ff7b72; }
+.btn-ref {
+  background:transparent; color:rgba(255,255,255,.4);
+  border:2px solid rgba(255,255,255,.1); padding:11px 18px;
+  font-size:.78rem;
+}
+.btn-ref:hover { background:rgba(255,255,255,.05); color:#fff; }
+
+/* ── GUIDE PANEL ── */
+.guide-panel {
+  background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px; padding:14px 14px; animation:fadeUp .25s ease both;
+}
+.guide-rows { display:flex; flex-direction:column; gap:3px; margin-top:8px; }
+.gr-row {
+  display:flex; align-items:center; gap:10px;
+  padding:7px 10px; border-radius:8px;
+  background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
+  transition:background .15s;
+}
+.gr-row:hover { background:rgba(255,255,255,.06); }
+.gr-icon { font-size:1.1rem; width:22px; text-align:center; flex-shrink:0; }
+.gr-info { flex:1; display:flex; flex-direction:column; gap:2px; }
+.gr-name { font-size:.76rem; font-weight:700; color:#fff; letter-spacing:.5px; }
+.gr-desc { font-size:.62rem; color:var(--muted); }
+.gr-lvl  { font-size:.6rem; color:var(--gold); margin-left:4px; }
+.gr-score { display:flex; align-items:center; gap:5px; white-space:nowrap; }
+.gr-c  { font-size:.75rem; font-weight:700; color:var(--chip); }
+.gr-x  { font-size:.68rem; color:var(--muted); }
+.gr-m  { font-size:.75rem; font-weight:700; color:var(--mult); }
+
+/* ── CENTER SCREENS ── */
+.screen {
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:20px; padding:40px 20px; text-align:center;
+}
+.gtitle {
+  font-size:4.2rem; font-weight:700; color:var(--gold); letter-spacing:10px;
+  text-shadow:0 0 40px rgba(232,184,75,.7),0 0 80px rgba(232,184,75,.3);
+  animation:glow 2.5s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from { text-shadow:0 0 30px rgba(232,184,75,.5),0 0 60px rgba(232,184,75,.2); }
+  to   { text-shadow:0 0 60px rgba(232,184,75,1),0 0 120px rgba(232,184,75,.5),0 0 200px rgba(232,184,75,.15); }
+}
+.sub { color:rgba(255,255,255,.45); font-size:.95rem; letter-spacing:1px; }
+.info-box {
+  background:linear-gradient(135deg,#1c1628,#13101c);
+  border:1px solid rgba(232,184,75,0.18); border-radius:18px;
+  padding:22px 28px; max-width:530px; width:100%; text-align:left;
+}
+.info-box h3 {
+  font-size:.62rem; font-weight:600; color:var(--gold); text-transform:uppercase;
+  letter-spacing:4px; text-align:center; margin-bottom:14px;
+}
+.info-box p { font-size:.82rem; color:rgba(255,255,255,.6); margin-bottom:5px; line-height:1.6; }
+.hgrid { display:grid; grid-template-columns:1fr auto; gap:3px 16px; margin-top:12px; }
+.hn { font-size:.74rem; color:rgba(255,255,255,.55); padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.hv { font-size:.74rem; color:var(--gold); text-align:right; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); white-space:nowrap; }
+.btn.xl { padding:14px 50px; font-size:1.05rem; letter-spacing:2.5px; margin-top:6px; }
+
+/* ── SHOP / REWARD SCREEN ── */
+.reward-screen {
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:22px; padding:30px 20px;
+}
+.reward-title {
+  font-size:2.8rem; font-weight:700; color:var(--gold);
+  letter-spacing:6px; text-align:center;
+  text-shadow:0 0 30px rgba(232,184,75,.6);
+}
+.reward-sub { color:rgba(255,255,255,.45); font-size:.88rem; letter-spacing:1px; }
+.reward-next { color:var(--gold); font-size:.82rem; opacity:.75; }
+.reward-grid { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+
+/* Item card */
+.item-card {
+  width:170px; cursor:pointer;
+  border:2px solid; border-radius:16px; overflow:hidden;
+  background:linear-gradient(160deg,#1c1628,#13101c);
+  transition:transform .22s, box-shadow .22s;
+  animation:cardAppear .4s cubic-bezier(.175,.885,.32,1.275) both;
+}
+.item-card:nth-child(1) { animation-delay:.05s; }
+.item-card:nth-child(2) { animation-delay:.15s; }
+.item-card:nth-child(3) { animation-delay:.25s; }
+@keyframes cardAppear {
+  from { opacity:0; transform:scale(.7) translateY(30px) rotate(-4deg); }
+  to   { opacity:1; transform:scale(1)  translateY(0)    rotate(0); }
+}
+.item-card:hover { transform:translateY(-10px); }
+
+.item-top {
+  height:88px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px; position:relative;
+}
+.item-top::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0,rgba(255,255,255,.04) 1px,transparent 1px,transparent 9px);
+}
+.item-icon { font-size:2.4rem; z-index:1; }
+.cat-badge {
+  font-size:.52rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:2px 8px; border-radius:20px; background:rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); z-index:1;
+}
+
+.item-body { padding:12px 12px 14px; }
+.item-name { font-size:.82rem; font-weight:700; margin-bottom:4px; letter-spacing:.5px; }
+.item-desc { font-size:.67rem; color:rgba(255,255,255,.52); line-height:1.45; margin-bottom:10px; }
+.item-pick {
+  width:100%; padding:7px; border:none; border-radius:8px;
+  font-size:.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:pointer; color:#fff; font-family:var(--font);
+  transition:opacity .15s;
+}
+.item-pick:hover { opacity:.85; }
+.item-lvl { font-size:.6rem; color:rgba(255,255,255,.4); margin-bottom:4px; }
+
+/* ── WIN / LOSE ── */
+.big-icon { font-size:5rem; animation:bounce .55s cubic-bezier(.175,.885,.32,1.275) both; }
+@keyframes bounce {
+  from { transform:scale(0) rotate(-20deg); }
+  to   { transform:scale(1) rotate(0); }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ══════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════
+const SUITS  = ['♠','♥','♦','♣'];
+const RANKS  = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const ORD    = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
+const BASE_CHIPS = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':10,'Q':10,'K':10,'A':11};
+
+// Base hand info (chips, mult) — modified by planet upgrades
+const HINFO = {
+  'Royal Flush':    {c:100,m:8},
+  'Straight Flush': {c:100,m:8},
+  'Four of a Kind': {c:60, m:7},
+  'Full House':     {c:40, m:4},
+  'Flush':          {c:35, m:4},
+  'Straight':       {c:30, m:4},
+  'Three of a Kind':{c:30, m:3},
+  'Two Pair':       {c:20, m:2},
+  'Pair':           {c:10, m:2},
+  'High Card':      {c:5,  m:1},
+};
+
+// Jokers — permanent passive bonuses
+const JOKERS = [
+  {id:'classic',  name:'Joker',       icon:'🃏', eff:'+4 Mult always',                c1:'#8b1c1c',c2:'#5a0f0f',bc:'#e74c3c'},
+  {id:'half',     name:'Half Joker',  icon:'🌗', eff:'+20 Chips if ≤3 cards played',  c1:'#4a1a70',c2:'#2e0e4e',bc:'#9b59b6'},
+  {id:'banner',   name:'Banner',      icon:'🚩', eff:'+30 Chips per discard left',     c1:'#7d3200',c2:'#4a1e00',bc:'#e67e22'},
+  {id:'emperor',  name:'Emperor',     icon:'👑', eff:'Face cards give +15 Chips each', c1:'#0e3d6e',c2:'#082540',bc:'#2e86c1'},
+  {id:'lovers',   name:'The Lovers',  icon:'💘', eff:'+3 Mult when hand has a Pair+', c1:'#7a1040',c2:'#4d0828',bc:'#e91e63'},
+  {id:'wheel',    name:'Fortune',     icon:'🎡', eff:'+2 Mult per discard used',       c1:'#0b4a35',c2:'#072e21',bc:'#1abc9c'},
+  {id:'sun',      name:'The Sun',     icon:'☀️', eff:'Flushes: ×2 Mult',              c1:'#6b5200',c2:'#3d2f00',bc:'#f1c40f'},
+  {id:'moon',     name:'The Moon',    icon:'🌙', eff:'Straights: +60 Chips',           c1:'#2a1545',c2:'#180c2a',bc:'#a29bfe'},
+  {id:'tower',    name:'The Tower',   icon:'🗼', eff:'Four of a Kind: +100 Chips',     c1:'#1a2535',c2:'#0e151f',bc:'#7f8c8d'},
+  {id:'fool',     name:'The Fool',    icon:'🤹', eff:'+12 Chips to every hand',        c1:'#0e4a22',c2:'#082c14',bc:'#2ecc71'},
+  {id:'cardsharp',name:'Card Sharp',  icon:'🎯', eff:'+4 Mult for repeated hand types',c1:'#0a2a45',c2:'#051828',bc:'#3498db'},
+  {id:'misprint', name:'Misprint',    icon:'🎲', eff:'+1 to +6 Mult (random!)',        c1:'#4a2200',c2:'#2a1300',bc:'#e67e22'},
+  {id:'steel',    name:'Steel Idol',  icon:'⚙️', eff:'+1 Mult per Joker you own',     c1:'#2a3035',c2:'#181e22',bc:'#95a5a6'},
+  {id:'nova',     name:'Supernova',   icon:'💥', eff:'+1 Mult per card in hand',       c1:'#5a1a18',c2:'#350f0e',bc:'#ff7675'},
+];
+
+// Planets — upgrade specific hand types (+15 chips, +1 mult per level)
+const PLANETS = [
+  {id:'pl_pair',   hand:'Pair',           name:'Mercury',  icon:'⚪', desc:'Upgrades Pair (+15 chips, +1 mult)',           bc:'#95a5a6'},
+  {id:'pl_2pair',  hand:'Two Pair',       name:'Venus',    icon:'🟠', desc:'Upgrades Two Pair (+15 chips, +1 mult)',       bc:'#e67e22'},
+  {id:'pl_3oak',   hand:'Three of a Kind',name:'Earth',    icon:'🌍', desc:'Upgrades Three of a Kind (+15 chips, +1 mult)',bc:'#3498db'},
+  {id:'pl_str',    hand:'Straight',       name:'Mars',     icon:'🔴', desc:'Upgrades Straight (+15 chips, +1 mult)',       bc:'#e74c3c'},
+  {id:'pl_flush',  hand:'Flush',          name:'Jupiter',  icon:'🟡', desc:'Upgrades Flush (+15 chips, +1 mult)',          bc:'#f1c40f'},
+  {id:'pl_full',   hand:'Full House',     name:'Saturn',   icon:'🪐', desc:'Upgrades Full House (+15 chips, +1 mult)',     bc:'#9b59b6'},
+  {id:'pl_4oak',   hand:'Four of a Kind', name:'Uranus',   icon:'🔵', desc:'Upgrades Four of a Kind (+15 chips, +1 mult)',bc:'#1abc9c'},
+  {id:'pl_sf',     hand:'Straight Flush', name:'Neptune',  icon:'🌊', desc:'Upgrades Straight Flush (+15 chips, +1 mult)',bc:'#2980b9'},
+  {id:'pl_rf',     hand:'Royal Flush',    name:'Pluto',    icon:'💜', desc:'Upgrades Royal Flush (+15 chips, +1 mult)',   bc:'#8e44ad'},
+  {id:'pl_hc',     hand:'High Card',      name:'Ceres',    icon:'⭐', desc:'Upgrades High Card (+15 chips, +1 mult)',     bc:'#f39c12'},
+];
+
+// Vouchers — permanent game upgrades (one-time)
+const VOUCHERS = [
+  {id:'v_hand',  name:'Extra Hand',  icon:'🖐️', desc:'Gain +1 hand play per round permanently',bc:'#2ecc71'},
+  {id:'v_dis',   name:'Retention',   icon:'♻️', desc:'Gain +1 discard per round permanently',  bc:'#3498db'},
+  {id:'v_size',  name:'Overstock',   icon:'📦', desc:'Draw 1 extra card per round',            bc:'#9b59b6'},
+  {id:'v_face',  name:'Face Boost',  icon:'👸', desc:'J, Q, K each worth +5 Chips',            bc:'#e91e63'},
+  {id:'v_mult',  name:'Amplifier',   icon:'⚡', desc:'All hands permanently get +1 Mult',      bc:'#f1c40f'},
+  {id:'v_ace',   name:'Ace Boost',   icon:'🂡', desc:'Aces each worth +5 Chips',               bc:'#e74c3c'},
+  {id:'v_lucky', name:'Lucky 7',     icon:'🍀', desc:'+7 Chips and +0.7 Mult to every hand',  bc:'#1abc9c'},
+];
+
+// Rounds — targets escalate. After these, endless mode generates more
+const BASE_ROUNDS = [
+  {name:'Small Blind',   target:300},
+  {name:'Big Blind',     target:800},
+  {name:'The Hook',      target:2000},
+  {name:'The Ox',        target:5000},
+  {name:'The Arm',       target:12000},
+  {name:'The Vessel',    target:30000},
+  {name:'The Psychic',   target:80000},
+  {name:'The Eye',       target:200000},
+  {name:'The Needle',    target:500000},
+  {name:'The Head',      target:1500000},
+];
+
+function getRound(n) {
+  if(n < BASE_ROUNDS.length) return BASE_ROUNDS[n];
+  const extra = n - BASE_ROUNDS.length + 1;
+  const last  = BASE_ROUNDS[BASE_ROUNDS.length-1].target;
+  return { name:`The Abyss ${extra}`, target: Math.floor(last * Math.pow(3.5, extra)) };
+}
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let G = {}, A = {};
+
+function initG() {
+  G = {
+    deck:[], hand:[], sel:new Set(),
+    jokers:[], vouchers:[],
+    handLevels:{},         // hand name → upgrade level
+    baseHands:4, baseDiscards:3, handSize:8,
+    faceBonus:0, aceBonus:0, baseMult:0, luckyBonus:0,
+    score:0, round:0,
+    plays:0, discards:0, discardUsed:0,
+    phase:'start',
+    played:{}, lastR:null,
+    shopQ:[], newIds:new Set(),
+    guide:false,
+  };
+}
+
+function initA() { A = { on:false, going:new Set(), phase:'', result:null }; }
+
+// ══════════════════════════════════════════════
+//  DECK
+// ══════════════════════════════════════════════
+function mkDeck() {
+  let id=0, d=[];
+  for(const s of SUITS) for(const r of RANKS) d.push({s,r,id:id++});
+  return d;
+}
+
+function shufl(a) {
+  a=[...a];
+  for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function deal(n) {
+  const k=Math.min(n,G.deck.length);
+  const drawn=G.deck.splice(0,k);
+  G.newIds=new Set(drawn.map(c=>c.id));
+  G.hand.push(...drawn);
+}
+
+// ══════════════════════════════════════════════
+//  HAND EVALUATION
+// ══════════════════════════════════════════════
+function evalHand(cards) {
+  const n=cards.length;
+  if(!n) return null;
+  if(n===1) return 'High Card';
+
+  const vs=cards.map(c=>ORD[c.r]).sort((a,b)=>a-b);
+  const ss=cards.map(c=>c.s);
+  const freq={}; vs.forEach(v=>freq[v]=(freq[v]||0)+1);
+  const cnts=Object.values(freq).sort((a,b)=>b-a);
+
+  const flush    = n===5 && ss.every(x=>x===ss[0]);
+  const straight = n===5 && (()=>{
+    const u=[...new Set(vs)].sort((a,b)=>a-b);
+    if(u.length!==5) return false;
+    if(u[4]-u[0]===4) return true;
+    if(u.join(',') === '2,3,4,5,14') return true;
+    return false;
+  })();
+
+  if(flush && straight) {
+    const mx=Math.max(...vs);
+    return (mx===14 && vs.includes(13)) ? 'Royal Flush' : 'Straight Flush';
+  }
+  if(cnts[0]===4)              return 'Four of a Kind';
+  if(cnts[0]===3&&cnts[1]===2) return 'Full House';
+  if(flush)                    return 'Flush';
+  if(straight)                 return 'Straight';
+  if(cnts[0]===3)              return 'Three of a Kind';
+  if(cnts[0]===2&&cnts[1]===2) return 'Two Pair';
+  if(cnts[0]===2)              return 'Pair';
+  return 'High Card';
+}
+
+// ══════════════════════════════════════════════
+//  SCORING
+// ══════════════════════════════════════════════
+function calcScore(cards, hname) {
+  const base  = HINFO[hname];
+  const level = G.handLevels[hname] || 0;
+  let chips   = base.c + level * 15;
+  let mult    = base.m + level + G.baseMult;
+
+  // Card chip values
+  for(const c of cards) {
+    let cv = BASE_CHIPS[c.r];
+    if(['J','Q','K'].includes(c.r)) cv += G.faceBonus;
+    if(c.r === 'A') cv += G.aceBonus;
+    chips += cv;
+  }
+
+  // Lucky voucher
+  chips += G.luckyBonus;
+  mult  += G.luckyBonus * 0.7;
+
+  // Joker effects
+  for(const j of G.jokers){
+    switch(j.id){
+      case 'classic':   mult+=4; break;
+      case 'half':      if(cards.length<=3) chips+=20; break;
+      case 'banner':    chips+=30*G.discards; break;
+      case 'emperor':
+        for(const c of cards) if(['J','Q','K'].includes(c.r)) chips+=15; break;
+      case 'lovers':
+        if(['Pair','Two Pair','Full House','Four of a Kind'].includes(hname)) mult+=3; break;
+      case 'wheel':     mult+=G.discardUsed*2; break;
+      case 'sun':
+        if(['Flush','Straight Flush','Royal Flush'].includes(hname)) mult*=2; break;
+      case 'moon':
+        if(['Straight','Straight Flush','Royal Flush'].includes(hname)) chips+=60; break;
+      case 'tower':
+        if(hname==='Four of a Kind') chips+=100; break;
+      case 'fool':      chips+=12; break;
+      case 'cardsharp': if((G.played[hname]||0)>0) mult+=4; break;
+      case 'misprint':  mult+=1+Math.floor(Math.random()*6); break;
+      case 'steel':     mult+=G.jokers.length; break;
+      case 'nova':      mult+=G.hand.length; break;
+    }
+  }
+
+  mult = Math.max(1, mult);
+  return { chips: Math.floor(chips), mult: Math.round(mult*10)/10, total: Math.floor(chips*mult), hname, level };
+}
+
+// ══════════════════════════════════════════════
+//  GAME ACTIONS
+// ══════════════════════════════════════════════
+function startGame() { initG(); initA(); beginRound(); }
+
+function beginRound() {
+  G.deck = shufl(mkDeck()); G.hand=[]; G.sel=new Set();
+  G.plays = G.baseHands; G.discards = G.baseDiscards; G.discardUsed=0;
+  G.score=0; G.lastR=null; G.played={};
+  G.phase='playing';
+  deal(G.handSize); render();
+}
+
+function toggleCard(id) {
+  if(A.on||G.phase!=='playing') return;
+  if(G.sel.has(id)) G.sel.delete(id);
+  else if(G.sel.size<5) G.sel.add(id);
+  render();
+}
+
+function playHand() {
+  if(A.on||G.phase!=='playing'||!G.sel.size||G.plays<=0) return;
+  const played = G.hand.filter(c=>G.sel.has(c.id));
+  const hname  = evalHand(played);
+  const result = calcScore(played, hname);
+
+  A.on=true; A.going=new Set(G.sel); A.phase='launch'; A.result=result;
+  render();
+
+  setTimeout(()=>{
+    G.hand = G.hand.filter(c=>!G.sel.has(c.id));
+    G.sel  = new Set();
+    G.plays--;
+    G.played[hname]=(G.played[hname]||0)+1;
+    G.score+=result.total;
+    G.lastR=result;
+    A.going=new Set(); A.phase='scoring';
+    deal(Math.min(G.handSize-G.hand.length, G.deck.length));
+    render();
+
+    setTimeout(()=>{
+      A.on=false; A.phase='';
+      const target=getRound(G.round).target;
+      if(G.score>=target){
+        G.phase='shop'; buildShop();
+      } else if(G.plays===0){
+        G.phase='lost';
+      }
+      render();
+    }, 1900);
+  }, 460);
+}
+
+function discardCards() {
+  if(A.on||G.phase!=='playing'||!G.sel.size||G.discards<=0) return;
+  G.hand=G.hand.filter(c=>!G.sel.has(c.id));
+  G.sel=new Set(); G.discards--; G.discardUsed++; G.lastR=null;
+  deal(Math.min(G.handSize-G.hand.length, G.deck.length)); render();
+}
+
+function buildShop() {
+  const ownedJ = new Set(G.jokers.map(j=>j.id));
+  const ownedV = new Set(G.vouchers.map(v=>v.id));
+  let pool=[];
+
+  // Jokers (exclude owned, only if under cap)
+  if(G.jokers.length<5)
+    pool.push(...JOKERS.filter(j=>!ownedJ.has(j.id)).map(j=>({...j,cat:'joker'})));
+
+  // Planets (always available, stackable levels)
+  pool.push(...PLANETS.map(p=>({...p,cat:'planet'})));
+
+  // Vouchers (exclude owned)
+  pool.push(...VOUCHERS.filter(v=>!ownedV.has(v.id)).map(v=>({...v,cat:'voucher'})));
+
+  G.shopQ = shufl(pool).slice(0,3);
+}
+
+function pickItem(i) {
+  const item = G.shopQ[i];
+  if(item.cat==='joker')   { if(G.jokers.length<5) G.jokers.push(item); }
+  if(item.cat==='planet')  { G.handLevels[item.hand]=(G.handLevels[item.hand]||0)+1; }
+  if(item.cat==='voucher') { G.vouchers.push(item); applyVoucher(item); }
+  G.round++; beginRound();
+}
+
+function applyVoucher(v) {
+  switch(v.id){
+    case 'v_hand':  G.baseHands++;    break;
+    case 'v_dis':   G.baseDiscards++; break;
+    case 'v_size':  G.handSize++;     break;
+    case 'v_face':  G.faceBonus+=5;  break;
+    case 'v_mult':  G.baseMult++;     break;
+    case 'v_ace':   G.aceBonus+=5;   break;
+    case 'v_lucky': G.luckyBonus+=7; break;
+  }
+}
+
+function skipShop(){ G.round++; beginRound(); }
+function toggleGuide(){ G.guide=!G.guide; render(); }
+
+// ══════════════════════════════════════════════
+//  HTML BUILDERS
+// ══════════════════════════════════════════════
+function isRed(s){ return s==='♥'||s==='♦'; }
+
+function faceCardSVG(rank, suit) {
+  const red  = isRed(suit);
+  const robe = red ? '#7b1a1a' : '#1a1a6e';
+  const rob2 = red ? '#a93226' : '#2540a0';
+  const hair = rank === 'Q' ? '#8b5e0a' : '#2c1810';
+  const crwn = rank === 'K' ? '#ffd700' : rank === 'Q' ? '#e8b84b' : '#b0b0b0';
+  const skin = '#fde8c8'; const sknd = '#d4b090';
+  const eye  = red ? '#5a1515' : '#15155a';
+  const lip  = '#b03030';
+  const s    = suit;
+
+  if (rank === 'K') return `<svg viewBox="0 0 58 72" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="9,25 15,11 22,21 29,6 36,21 43,11 49,25" fill="${crwn}" stroke="#b8900a" stroke-width=".8"/>
+    <circle cx="29" cy="8"  r="3"   fill="${red?'#e74c3c':'#9b59b6'}"/>
+    <circle cx="15" cy="13" r="2"   fill="${red?'#f39c12':'#3498db'}"/>
+    <circle cx="43" cy="13" r="2"   fill="${red?'#9b59b6':'#1abc9c'}"/>
+    <rect x="10" y="23" width="38" height="6" rx="2" fill="${crwn}" stroke="#b8900a" stroke-width=".6"/>
+    <ellipse cx="13" cy="36" rx="4"  ry="10" fill="${hair}"/>
+    <ellipse cx="45" cy="36" rx="4"  ry="10" fill="${hair}"/>
+    <ellipse cx="29" cy="38" rx="15" ry="13" fill="${skin}" stroke="${sknd}" stroke-width=".5"/>
+    <path d="M21,31 Q25,29 28,31" fill="none" stroke="${hair}" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M30,31 Q33,29 37,31" fill="none" stroke="${hair}" stroke-width="1.2" stroke-linecap="round"/>
+    <ellipse cx="24" cy="35" rx="2.8" ry="2.2" fill="white"/>
+    <ellipse cx="34" cy="35" rx="2.8" ry="2.2" fill="white"/>
+    <circle  cx="24" cy="35" r="1.5" fill="${eye}"/>
+    <circle  cx="34" cy="35" r="1.5" fill="${eye}"/>
+    <circle  cx="24.5" cy="34.5" r=".55" fill="white"/>
+    <circle  cx="34.5" cy="34.5" r=".55" fill="white"/>
+    <path d="M27,39 Q29,41 31,39" fill="none" stroke="${sknd}" stroke-width=".8"/>
+    <path d="M21,41 Q25,43.5 29,41.5 Q33,43.5 37,41" fill="${hair}"/>
+    <path d="M24,44 Q29,47 34,44" fill="none" stroke="${lip}" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M17,44 Q29,57 41,44 L38,53 Q29,59 20,53 Z" fill="${hair}" opacity=".92"/>
+    <path d="M10,54 Q29,61 48,54 L50,72 L8,72 Z" fill="${robe}"/>
+    <path d="M20,54 L29,60 L38,54" fill="${rob2}"/>
+    <path d="M25,54 L29,58 L33,54" fill="white" stroke="#ccc" stroke-width=".5"/>
+    <text x="29" y="68" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.85)" font-family="serif">${s}</text>
+  </svg>`;
+
+  if (rank === 'Q') return `<svg viewBox="0 0 58 72" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14,27 L14,17 L20,23 L29,13 L38,23 L44,17 L44,27 Z" fill="${crwn}" stroke="#b8900a" stroke-width=".8"/>
+    <circle cx="29" cy="15" r="3"   fill="${red?'#e74c3c':'#9b59b6'}"/>
+    <circle cx="16" cy="19" r="2"   fill="${red?'#f39c12':'#3498db'}"/>
+    <circle cx="42" cy="19" r="2"   fill="${red?'#9b59b6':'#1abc9c'}"/>
+    <rect x="12" y="25" width="34" height="5" rx="2" fill="${crwn}" stroke="#b8900a" stroke-width=".5"/>
+    <path d="M8,32 Q5,48 9,62 Q13,56 15,50" fill="${hair}" stroke="none"/>
+    <path d="M50,32 Q53,48 49,62 Q45,56 43,50" fill="${hair}" stroke="none"/>
+    <ellipse cx="29" cy="30" rx="18" ry="5" fill="${hair}"/>
+    <ellipse cx="29" cy="38" rx="14" ry="13" fill="${skin}" stroke="${sknd}" stroke-width=".5"/>
+    <path d="M21,31 Q25,28 28,30" fill="none" stroke="${hair}" stroke-width="1" stroke-linecap="round"/>
+    <path d="M30,30 Q33,28 37,31" fill="none" stroke="${hair}" stroke-width="1" stroke-linecap="round"/>
+    <ellipse cx="24" cy="35" rx="3"   ry="2.3" fill="white"/>
+    <ellipse cx="34" cy="35" rx="3"   ry="2.3" fill="white"/>
+    <circle  cx="24" cy="35" r="1.6" fill="${eye}"/>
+    <circle  cx="34" cy="35" r="1.6" fill="${eye}"/>
+    <circle  cx="24.5" cy="34.5" r=".55" fill="white"/>
+    <circle  cx="34.5" cy="34.5" r=".55" fill="white"/>
+    <line x1="21" y1="31" x2="20" y2="29" stroke="${hair}" stroke-width=".7"/>
+    <line x1="24" y1="30" x2="24" y2="28" stroke="${hair}" stroke-width=".7"/>
+    <line x1="27" y1="31" x2="28" y2="29" stroke="${hair}" stroke-width=".7"/>
+    <line x1="31" y1="31" x2="30" y2="29" stroke="${hair}" stroke-width=".7"/>
+    <line x1="34" y1="30" x2="34" y2="28" stroke="${hair}" stroke-width=".7"/>
+    <line x1="37" y1="31" x2="38" y2="29" stroke="${hair}" stroke-width=".7"/>
+    <path d="M28,39 Q29,41 30,39" fill="none" stroke="${sknd}" stroke-width=".8"/>
+    <path d="M23,42 Q26,40 29,42 Q32,40 35,42" fill="${lip}" stroke="none"/>
+    <path d="M23,42 Q29,45 35,42" fill="#8b2020" stroke="none"/>
+    <path d="M22,50 Q29,55 36,50" fill="none" stroke="${crwn}" stroke-width="1.5"/>
+    <circle cx="29" cy="55" r="2" fill="${crwn}"/>
+    <path d="M10,52 Q29,60 48,52 L50,72 L8,72 Z" fill="${robe}"/>
+    <path d="M20,52 L29,60 L38,52" fill="${rob2}"/>
+    <path d="M25,52 L29,56 L33,52" fill="white" stroke="#ddd" stroke-width=".5"/>
+    <text x="29" y="69" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.85)" font-family="serif">${s}</text>
+  </svg>`;
+
+  if (rank === 'J') return `<svg viewBox="0 0 58 72" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11,26 Q29,18 47,26 L47,22 Q29,13 11,22 Z" fill="${robe}" stroke="${rob2}" stroke-width=".5"/>
+    <ellipse cx="29" cy="26" rx="19" ry="4" fill="${rob2}"/>
+    <path d="M40,20 Q52,11 50,4 Q45,9 43,15 Q40,13 36,17" fill="${red?'#e74c3c':'#9b59b6'}" opacity=".9"/>
+    <ellipse cx="13" cy="37" rx="3.5" ry="9" fill="${hair}"/>
+    <ellipse cx="45" cy="37" rx="3.5" ry="9" fill="${hair}"/>
+    <ellipse cx="29" cy="38" rx="14" ry="13" fill="${skin}" stroke="${sknd}" stroke-width=".5"/>
+    <path d="M21,32 Q25,30 28,32" fill="none" stroke="${hair}" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M30,32 Q33,30 37,32" fill="none" stroke="${hair}" stroke-width="1.2" stroke-linecap="round"/>
+    <ellipse cx="24" cy="35" rx="2.6" ry="2.1" fill="white"/>
+    <ellipse cx="34" cy="35" rx="2.6" ry="2.1" fill="white"/>
+    <circle  cx="24" cy="35" r="1.4" fill="${eye}"/>
+    <circle  cx="34" cy="35" r="1.4" fill="${eye}"/>
+    <circle  cx="24.5" cy="34.5" r=".5" fill="white"/>
+    <circle  cx="34.5" cy="34.5" r=".5" fill="white"/>
+    <ellipse cx="29" cy="39" rx="1.5" ry="1" fill="${sknd}"/>
+    <path d="M25,43 Q27,41 29,43 Q31,44 33,43" fill="none" stroke="${lip}" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M10,53 Q29,61 48,53 L50,72 L8,72 Z" fill="${robe}"/>
+    <path d="M20,53 L23,60 L29,58 L35,60 L38,53" fill="${rob2}"/>
+    <path d="M25,53 L29,57 L33,53" fill="white" stroke="#ddd" stroke-width=".5"/>
+    <circle cx="19" cy="60" r="3.5" fill="${crwn}" stroke="#a09000" stroke-width=".5"/>
+    <text x="29" y="69" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.85)" font-family="serif">${s}</text>
+  </svg>`;
+}
+
+function cardHTML(card) {
+  const inSel  = G.sel.has(card.id);
+  const inGo   = A.going.has(card.id);
+  const isNew  = G.newIds.has(card.id);
+  const isFace = ['J','Q','K'].includes(card.r);
+  const idx    = G.hand.findIndex(c=>c.id===card.id);
+  const delay  = isNew ? `style="animation-delay:${idx*42}ms"` : '';
+  const cls    = [
+    isRed(card.s) ? 'red' : '',
+    inSel  ? 'sel'       : '',
+    inGo   ? 'go'        : '',
+    isNew  ? 'dealt'     : '',
+    isFace ? 'face-card' : '',
+  ].filter(Boolean).join(' ');
+
+  const middle = isFace
+    ? `<div class="c-face">${faceCardSVG(card.r, card.s)}</div>`
+    : `<div class="c-mid">${card.s}</div>`;
+
+  return `<div class="card ${cls}" onclick="toggleCard(${card.id})" ${delay}>
+    <div class="c-corner"><div class="c-rank">${card.r}</div><div class="c-ss">${card.s}</div></div>
+    ${middle}
+    <div class="c-corner bot"><div class="c-rank">${card.r}</div><div class="c-ss">${card.s}</div></div>
+  </div>`;
+}
+
+function jokerTileHTML(j) {
+  return `<div class="jtile" style="background:linear-gradient(160deg,${j.c1},${j.c2});border-color:${j.bc};box-shadow:0 4px 16px ${j.bc}44">
+    <div class="j-icon">${j.icon}</div>
+    <div class="j-name" style="color:${j.bc}">${j.name}</div>
+    <div class="j-eff">${j.eff}</div>
+  </div>`;
+}
+
+function eqHTML(r) {
+  return `<div class="eq">
+    <div class="chip-box">💰 ${r.chips}</div>
+    <div class="eq-op">×</div>
+    <div class="mult-box">✖ ${r.mult}</div>
+    <div class="eq-op">=</div>
+    <div class="tot">+${r.total.toLocaleString()}</div>
+  </div>`;
+}
+
+function previewHTML() {
+  if(!G.sel.size||A.on) return '';
+  const cards=G.hand.filter(c=>G.sel.has(c.id));
+  const hname=evalHand(cards);
+  const r=calcScore(cards,hname);
+  const lvl=G.handLevels[hname]||0;
+  return `<div class="preview">
+    <span class="prev-hname">${hname}${lvl>0?` <span style="color:var(--gold);font-size:.7rem">Lv.${lvl+1}</span>`:''}</span>
+    <span class="prev-eq">
+      <span class="prev-c">💰${r.chips}</span> ×
+      <span class="prev-m">✖${r.mult}</span> =
+      <span class="prev-t">+${r.total.toLocaleString()}</span>
+    </span>
+  </div>`;
+}
+
+function guideHTML() {
+  const rows = Object.entries(HINFO).map(([n,{c,m}])=>{
+    const lvl = G.handLevels[n]||0;
+    const tc = c + lvl*15, tm = m + lvl + G.baseMult;
+    return `<div class="gr-row">
+      <span class="gr-icon">${handIcon(n)}</span>
+      <div class="gr-info">
+        <span class="gr-name">${n}${lvl>0?`<span class="gr-lvl">Lv.${lvl+1}</span>`:''}</span>
+        <span class="gr-desc">${handDesc(n)}</span>
+      </div>
+      <div class="gr-score">
+        <span class="gr-c">💰${tc}</span>
+        <span class="gr-x">×</span>
+        <span class="gr-m">✖${tm}</span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="guide-panel">
+    <div class="sec-lbl">Hand Reference — values include your current upgrades</div>
+    <div class="guide-rows">${rows}</div>
+  </div>`;
+}
+
+function handIcon(n){
+  const m={'Royal Flush':'👑','Straight Flush':'🔥','Four of a Kind':'💎',
+           'Full House':'🏠','Flush':'🌊','Straight':'📏',
+           'Three of a Kind':'🎯','Two Pair':'👯','Pair':'✌️','High Card':'🃏'};
+  return m[n]||'🃏';
+}
+function handDesc(n){
+  const m={'Royal Flush':'A K Q J 10 same suit','Straight Flush':'5 in a row same suit',
+           'Four of a Kind':'4 same rank','Full House':'3 of a kind + pair',
+           'Flush':'5 same suit (need 5 cards)','Straight':'5 in a row (need 5 cards)',
+           'Three of a Kind':'3 same rank','Two Pair':'2 different pairs',
+           'Pair':'2 same rank','High Card':'Anything else'};
+  return m[n]||'';
+}
+
+function itemCardHTML(item, i) {
+  const catColors = { joker:'#e74c3c', planet:'#3498db', voucher:'#2ecc71' };
+  const catLabel  = { joker:'JOKER',   planet:'PLANET',  voucher:'VOUCHER' };
+  const bc  = item.bc || catColors[item.cat];
+  const bg1 = item.c1 || (item.cat==='planet'?'#0e2a45':item.cat==='voucher'?'#0e3a1a':'#2a0a0a');
+  const bg2 = item.c2 || (item.cat==='planet'?'#071828':item.cat==='voucher'?'#071f0e':'#160505');
+  const lvl = item.cat==='planet' ? (G.handLevels[item.hand]||0) : -1;
+
+  return `<div class="item-card" style="border-color:${bc};box-shadow:0 0 24px ${bc}30" onclick="pickItem(${i})">
+    <div class="item-top" style="background:linear-gradient(160deg,${bg1},${bg2})">
+      <div class="item-icon">${item.icon}</div>
+      <div class="cat-badge" style="border-color:${bc}55;color:${bc}">${catLabel[item.cat]}</div>
+    </div>
+    <div class="item-body">
+      <div class="item-name" style="color:${bc}">${item.name}</div>
+      ${lvl>=0?`<div class="item-lvl">Currently Lv.${lvl+1} → Lv.${lvl+2}</div>`:''}
+      <div class="item-desc">${item.eff||item.desc}</div>
+      <button class="item-pick" style="background:${bc}">CHOOSE</button>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  SCREENS
+// ══════════════════════════════════════════════
+function renderGame() {
+  const ri  = getRound(G.round);
+  const pct = Math.min(100,(G.score/ri.target)*100);
+  const jokerRow = G.jokers.length
+    ? G.jokers.map(jokerTileHTML).join('')
+    : '<span class="no-j">Win a round to claim your first Joker!</span>';
+
+  const canPlay    = !A.on && G.sel.size>0 && G.plays>0;
+  const canDiscard = !A.on && G.sel.size>0 && G.discards>0;
+
+  let scoreArea='';
+  if(A.phase==='scoring' && A.result){
+    scoreArea=`<div class="htype">${A.result.hname}</div>${eqHTML(A.result)}`;
+  } else if(G.sel.size>0 && !A.on){
+    scoreArea=previewHTML();
+  } else if(G.lastR && !A.on){
+    scoreArea=`<div class="htype faded">${G.lastR.hname}</div>${eqHTML(G.lastR)}`;
+  } else {
+    scoreArea='<div class="hint">← Select cards to see your hand preview</div>';
+  }
+
+  return `<div class="frame">
+    <!-- Header -->
+    <div class="hdr">
+      <div class="blind-col">
+        <div class="blind-name">${ri.name}</div>
+        <div class="prog-row">
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+          <div class="score-txt">${G.score.toLocaleString()} / ${ri.target.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="pill p"><span class="pill-n">${G.plays}</span><span class="pill-l">Hands</span></div>
+        <div class="pill d"><span class="pill-n">${G.discards}</span><span class="pill-l">Discards</span></div>
+        <div class="pill k"><span class="pill-n">${G.deck.length}</span><span class="pill-l">Deck</span></div>
+      </div>
+    </div>
+
+    <!-- Jokers -->
+    <div class="joker-sec">
+      <div class="sec-lbl">Jokers${G.jokers.length>0?` (${G.jokers.length}/5)`:''}</div>
+      <div class="joker-row">${jokerRow}</div>
+    </div>
+
+    <!-- Felt Table -->
+    <div class="table">
+      <!-- Score / Preview -->
+      <div class="score-area">${scoreArea}</div>
+      <hr class="hand-divider">
+      <div class="hand-lbl">Your Hand — select up to 5 cards</div>
+      <!-- Cards -->
+      <div class="hand-cards">${G.hand.map(cardHTML).join('')}</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn btn-play" onclick="playHand()"    ${canPlay?'':'disabled'}>▶ Play Hand</button>
+      <button class="btn btn-dis"  onclick="discardCards()" ${canDiscard?'':'disabled'}>⟳ Discard</button>
+      <button class="btn btn-ref"  onclick="toggleGuide()">${G.guide?'✕ Hide':'📖 Hands'}</button>
+    </div>
+
+    ${G.guide ? guideHTML() : ''}
+  </div>`;
+}
+
+function renderStart() {
+  const rows=Object.entries(HINFO).map(([n,{c,m}])=>
+    `<div class="hn">${handIcon(n)} ${n}</div><div class="hv">${c} chips × ${m} mult</div>`
+  ).join('');
+  return `<div class="screen">
+    <div class="gtitle">🃏 BALONEY</div>
+    <div class="sub">A Balatro-inspired poker card game</div>
+    <div class="info-box">
+      <h3>How to Play</h3>
+      <p>• Click up to <b>5 cards</b> and press <b>Play Hand</b> to score.</p>
+      <p>• Score = (base chips + card values) × multiplier.</p>
+      <p>• Beat the score target before your hands run out.</p>
+      <p>• After each round, pick a <b>Joker</b>, <b>Planet</b>, or <b>Voucher</b> to power up.</p>
+      <p>• <b>Planets</b> permanently upgrade a hand type. <b>Vouchers</b> change the rules.</p>
+      <p>• The game never ends — it just gets harder. How far can you go?</p>
+      <div class="hgrid" style="margin-top:14px">${rows}</div>
+    </div>
+    <button class="btn btn-play xl" onclick="startGame()">▶ Start Game</button>
+  </div>`;
+}
+
+function renderShop() {
+  const ri   = getRound(G.round+1);
+  const round= G.round+1;
+  return `<div class="reward-screen">
+    <div class="reward-title">✨ Round ${G.round+1} Clear!</div>
+    <div class="reward-sub">Choose your reward — this choice is permanent</div>
+    <div class="reward-next">Next: <b>${ri.name}</b> — target <b>${ri.target.toLocaleString()}</b> chips</div>
+    <div class="reward-grid">
+      ${G.shopQ.map((item,i)=>itemCardHTML(item,i)).join('')}
+    </div>
+    <button class="btn btn-dis" style="margin-top:4px" onclick="skipShop()">Skip — No Reward</button>
+  </div>`;
+}
+
+function renderWon() {
+  return `<div class="screen">
+    <div class="big-icon">🏆</div>
+    <div class="gtitle">YOU WIN!</div>
+    <div class="sub">You beat round ${G.round+1}. The abyss awaits...</div>
+    <button class="btn btn-play xl" onclick="startGame()">Play Again</button>
+  </div>`;
+}
+
+function renderLost() {
+  const ri=getRound(G.round);
+  return `<div class="screen">
+    <div class="big-icon">💀</div>
+    <div class="gtitle" style="color:#ff7b72">BUST!</div>
+    <div class="sub">
+      Round ${G.round+1} — <b style="color:var(--gold)">${ri.name}</b><br>
+      Needed <b style="color:var(--gold)">${ri.target.toLocaleString()}</b> — scored <b style="color:#ff7b72">${G.score.toLocaleString()}</b>
+    </div>
+    <button class="btn btn-play xl" onclick="startGame()">Try Again</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════
+function render() {
+  const app=document.getElementById('app');
+  switch(G.phase){
+    case 'start':   app.innerHTML=renderStart(); break;
+    case 'playing': app.innerHTML=renderGame();  break;
+    case 'shop':    app.innerHTML=renderShop();  break;
+    case 'won':     app.innerHTML=renderWon();   break;
+    case 'lost':    app.innerHTML=renderLost();  break;
+  }
+  G.newIds=new Set();
+}
+
+// Boot
+initG(); initA(); render();
+</script>
+</body>
+</html>
